@@ -48,8 +48,12 @@ def list_topics(request):
   
   if request.method == "POST":
     serializer_data = TopicSerializer(data=request.data)
-    if data.is_valid():
-      serializer_data.save()
-      return Response(data= serializer_data.data, status=status.HTTP_201_CREATED)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    if serializer_data.is_valid():
+      title_check = serializer_data.validated_data.get("title")
+      topic, created =  Topic.objects.get_or_create(title=title_check)
+      return Response({"message": "Topic created or retrived succesfully"}, status=status.HTTP_201_CREATED)
+    return Response(serializer_data.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+def search_rooms(request):
+  pass
