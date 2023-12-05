@@ -1,19 +1,26 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.db.models import Q 
 from rest_framework.response import Response 
 from rest_framework import status
 from rest_framework.decorators import api_view
 from .models import Room,Topic
 from .serializers import RoomSerializer, TopicSerializer
 
-@api_view(["GET"])
+@api_view(["GET", "POST"])
 def list_rooms(request):
-  instance = Room.objects.all()
-  room = RoomSerializer(instance, many=True).data
-  return Response(room, status=status.HTTP_200_OK)
+  if request.method == "GET":
+    instance = Room.objects.all()
+    room = RoomSerializer(instance, many=True).data
+    return Response(room, status=status.HTTP_200_OK)
+  
+  elif request.method == "POST":
+    instance = RoomSerializer(data=request.data)
+    if instance.is_valid():
+      instance.save()
+      return Response(data=instance.data, status=status.HTTP_201_CREATED)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["GET","PUT","DELETE", "POST"])
+@api_view(["GET","PUT","DELETE"])
 def get_room(request, pk):
   try:
     instance = Room.objects.get(id=pk)
@@ -31,12 +38,7 @@ def get_room(request, pk):
       return Response(data=serializer.data)
     return Response(status=status.HTTP_400_BAD_REQUEST)
   
-  elif request.method == "POST":
-    instance = RoomSerializer(data=request.data)
-    if instance.is_valid():
-      instance.save()
-      return Response(data=instance.data, status=status.HTTP_201_CREATED)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(["GET", "POST"])
@@ -55,5 +57,16 @@ def list_topics(request):
     return Response(serializer_data.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(["GET"])
 def search_rooms(request):
-  pass
+  if request.method == "GET":
+    rooms = Room.objects.all()
+    query = request.query_params.get("query")
+
+    if query:
+      rooms = Room.objects.filter(Q(topic__title__icontains = query) | Q(name__icontains=query) | Q(description__icontains = query))
+
+    serializer = RoomSerializer(rooms, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
+  

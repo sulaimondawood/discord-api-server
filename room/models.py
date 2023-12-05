@@ -15,7 +15,7 @@ class Room(models.Model):
   topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name="topics")
   name = models.CharField(max_length=200, null=True, blank=True)
   members = models.ManyToManyField(CustomUser, related_name="room_members")
-  description = models.TextField()
+  description = models.TextField(blank=True, null=True)
   avatar = models.ImageField(default="default-room-avatar.png", null=True, blank=True)
   updated= models.DateTimeField(auto_now=True)
   created = models.DateTimeField( default=timezone.now)

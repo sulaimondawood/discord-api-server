@@ -4,6 +4,7 @@ from .models import Room, Topic
 class RoomSerializer(serializers.ModelSerializer):
   class Meta:
     model= Room
+    fields = "__all__"
  
 class TopicSerializer(serializers.ModelSerializer):
   class Meta:
