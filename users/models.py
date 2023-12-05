@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser,BaseUserManager
+from django.utils import timezone
 
 class CustomUserManager(BaseUserManager):
   def create_superuser(self, username, display_name, email, password, **extra_fields):
@@ -33,7 +34,8 @@ class CustomUser(AbstractUser):
   username  = models.CharField(max_length=150, unique=True)
   display_name = models.CharField(max_length=120)
   email = models.EmailField(unique=True)
-
+  avatar = models.ImageField()
+  created = models.DateTimeField(default=timezone.now)
   objects = CustomUserManager()
 
   USERNAME_FIELD = "email"
