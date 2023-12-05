@@ -4,12 +4,14 @@ from .models import CustomUser
 from .forms import CustomUserFrom, CustomUserChangeForm
 
 class UserAdminConfig(UserAdmin):
+  model = CustomUser
   # add_form= CustomUserFrom()
   # form = CustomUserChangeForm()
 
   ordering= ["-created"]
   list_display = ["email","username","display_name", "is_staff", "is_active"]
   list_filter = ["email", "username", "display_name"]
+
 
 
 admin.site.register(CustomUser, UserAdminConfig)

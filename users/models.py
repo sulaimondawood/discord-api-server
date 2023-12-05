@@ -36,7 +36,10 @@ class CustomUser(AbstractUser):
   email = models.EmailField(unique=True)
   avatar = models.ImageField(default="default-avatar.jpg", null=True, blank=True)
   created = models.DateTimeField(default=timezone.now)
+  bio = models.TextField(blank=True, null=True)
+  
   objects = CustomUserManager()
+
 
   USERNAME_FIELD = "email"
   REQUIRED_FIELDS = [ "username", "display_name"]
