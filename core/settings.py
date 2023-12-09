@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     "users",
     "room",
 
+
+    "corsheaders",
     "rest_framework",
     'rest_framework_simplejwt',
 ]
@@ -51,6 +53,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -134,6 +137,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR / "static/images")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "users.CustomUser"
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOWED_ORIGINS = [
+#   "http://127.0.0.1:8000",
+#   "http://localhost:3000",
+
+# ]
 
 REST_FRAMEWORK = {
   "DEFAULT_AUTHENTICATION_CLASSES":[

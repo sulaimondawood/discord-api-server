@@ -15,7 +15,7 @@ class CustomUserManager(BaseUserManager):
       raise ValueError("Superuser must have is_active set to True")
     
     if extra_fields.get("is_superuser") is not True:
-      raise ValueError("Superuser must have is_superser set to True")
+      raise ValueError("Superuser must have is_superuser set to True")
 
     return self.create_user(username, display_name,email, password, **extra_fields)
 
@@ -37,6 +37,7 @@ class CustomUser(AbstractUser):
   avatar = models.ImageField(default="default-avatar.jpg", null=True, blank=True)
   created = models.DateTimeField(default=timezone.now)
   bio = models.TextField(blank=True, null=True)
+  is_active = models.BooleanField(default=True)
   
   objects = CustomUserManager()
 

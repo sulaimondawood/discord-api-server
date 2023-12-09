@@ -13,3 +13,15 @@ def users(request):
   
   if request.method == "POST":
     pass
+
+
+@api_view(["POST"])
+def register_user(request):
+  if request.method == "POST":
+    serializer = UserSerializer(data=request.data)
+    if serializer.is_valid():
+      user = serializer.save()
+      if user:
+        return Response(status=status.HTTP_201_CREATED)
+      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+  return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
