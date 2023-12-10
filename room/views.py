@@ -77,6 +77,8 @@ def search_rooms(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
   
 
+
+
 @api_view(["POST"])
 def message_list(request):
   pass
