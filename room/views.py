@@ -4,21 +4,40 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from .models import Room,Topic
-from .serializers import RoomSerializer, TopicSerializer
+from .serializers import RoomSerializer, TopicSerializer , CreateRoomSerialiser
+from users.models import CustomUser
 
 @api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
 def list_rooms(request):
   if request.method == "GET":
     instance = Room.objects.all()
     room = RoomSerializer(instance, many=True).data
+    # room = Room.get_all_rooms(request)
     return Response(room, status=status.HTTP_200_OK)
     
-  
   elif request.method == "POST":
-    instance = RoomSerializer(data=request.data)
-    if instance.is_valid():
-      instance.save()
-      return Response(data=instance.data, status=status.HTTP_201_CREATED)
+    serializer = CreateRoomSerialiser(data=request.data)
+    if serializer.is_valid():
+      user = CustomUser.objects.get(pk=request.user.id)
+      if serializer.validated_data['is_new_topic']:
+        topic = Topic.objects.create(title=serializer.validated_data['topic'])
+      else:
+        try:
+          topic = Topic.objects.get(title=serializer.validated_data['topic'])
+        except:
+          return Response(dict(status=False,detail='Invalid topic'),status=status.HTTP_400_BAD_REQUEST)
+
+      instance = Room.objects.create(
+        host=user,
+        topic=topic,
+        description=serializer.validated_data['description'],
+        avatar=serializer.validated_data['avatar'],
+        name=serializer.validated_data['name'],
+
+      )
+    
+      return Response(data=instance, status=status.HTTP_201_CREATED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
