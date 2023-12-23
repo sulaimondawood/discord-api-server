@@ -9,17 +9,23 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
 from django.conf import settings
 from django.middleware import csrf
+from django.db.models import Q
+
 
 @api_view(["GET", "POST"])
 def users(request):
   if request.method == "GET":
     users = CustomUser.objects.all()
+
+    query = request.query_params.get("search")
+    print(query)
+    if query:
+      users = CustomUser.objects.filter(Q(username__icontains = query ))
     serializer = UserSerializer(users, many=True).data
     return  Response(status=status.HTTP_200_OK, data=serializer)
   
   if request.method == "POST":
     pass
-
 
 @api_view(["POST"])
 def register_user(request):

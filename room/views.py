@@ -3,45 +3,73 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from .models import Room,Topic
-from .serializers import RoomSerializer, TopicSerializer , CreateRoomSerialiser
+from .models import Room,Topic, Message
+from .serializers import RoomSerializer, TopicSerializer , CreateRoomSerializer, MessageSerializer, CreateMessageSerializer
 from users.models import CustomUser
 
-@api_view(["GET", "POST"])
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def list_rooms(request):
   if request.method == "GET":
+    print(request.user.id)
     instance = Room.objects.all()
-    room = RoomSerializer(instance, many=True).data
-    # room = Room.get_all_rooms(request)
+    room = RoomSerializer(instance, many=True, context={'request': request}).data
     return Response(room, status=status.HTTP_200_OK)
     
   elif request.method == "POST":
-    serializer = CreateRoomSerialiser(data=request.data)
+    print(request.data)
+    serializer = CreateRoomSerializer(data=request.data)
+    # serializer = RoomSerializer(data=request.data)
+
     if serializer.is_valid():
-      user = CustomUser.objects.get(pk=request.user.id)
-      if serializer.validated_data['is_new_topic']:
-        topic = Topic.objects.create(title=serializer.validated_data['topic'])
-      else:
-        try:
-          topic = Topic.objects.get(title=serializer.validated_data['topic'])
-        except:
-          return Response(dict(status=False,detail='Invalid topic'),status=status.HTTP_400_BAD_REQUEST)
+      topic = serializer.validated_data.get("topic")
+      print(serializer.validated_data.get("name"))
+      print(serializer.validated_data.get("topic"))
+      print(serializer.validated_data.get("description"))
+      print(request.user)
+      new_topic, created = Topic.objects.get_or_create(title= topic)
+
 
       instance = Room.objects.create(
-        host=user,
-        topic=topic,
+        host=request.user,
+        topic=new_topic,
         description=serializer.validated_data['description'],
         avatar=serializer.validated_data['avatar'],
         name=serializer.validated_data['name'],
 
       )
     
-      return Response(data=instance, status=status.HTTP_201_CREATED)
+      return Response(data=serializer, status=status.HTTP_201_CREATED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def create_room(request):
+  if request.method == "POST":
+    serializer = CreateRoomSerializer(data = request.data)
+    print(serializer)
+    print(request.data)
+    if serializer.is_valid():
+      topic = serializer.validated_data["topic"]
+      name = serializer.validated_data["name"]
+      desc = serializer.validated_data["description"]
+      new_topic, created = Topic.objects.get_or_create(title = topic )
+    #  this is causing an error
+      # avatar = serializer.validated_data['avatar']
 
-@api_view(["GET","PUT","DELETE"])
+      instance =  Room.objects.create(host=request.user, topic= new_topic, name=name, description=desc )
+
+    #  this is causing an error
+      # instance =  Room.objects.create(host=request.user, topic= new_topic, name=name, description=desc, avatar=avatar )
+
+      return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    return Response({"error": "Bad request from client"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+      
+@permission_classes([IsAuthenticated])
+@api_view(["GET","PUT","DELETE", "POST"])
 def get_room(request, pk):
   try:
     instance = Room.objects.get(id=pk)
@@ -49,8 +77,11 @@ def get_room(request, pk):
     return Response(status=status.HTTP_404_NOT_FOUND)
 
   if request.method == "GET":
+    # data = RoomSerializer(instance, context={"request": request}).data
     data = RoomSerializer(instance).data
-    return Response(data, status=status.HTTP_200_OK)
+    room_messages = Message.objects.filter(room__id= pk)
+    room_serialized_msgs =MessageSerializer(room_messages, many=True).data
+    return Response({"data":data,"room_messages": room_serialized_msgs}, status=status.HTTP_200_OK)
   
   elif request.method == "PUT":
     serializer = RoomSerializer(instance, data=request.data)
@@ -58,6 +89,16 @@ def get_room(request, pk):
       serializer.save()
       return Response(data=serializer.data)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+  
+  elif request.method == "POST":
+    serializer = CreateMessageSerializer(data=request.data, context={"request" :request, "room": instance})
+    print(request.data)
+    if serializer.is_valid():
+      serializer.save()
+      return Response(status=status.HTTP_201_CREATED, data={"message": "message succesfully sent!"})
+    
+    return Response( {"error": "Error occured while sending request to server"}, status=status.HTTP_400_BAD_REQUEST,)
+
   
   elif request.method == "DELETE":
     instance.delete()
@@ -91,13 +132,36 @@ def search_rooms(request):
     if query:
       rooms = Room.objects.filter(Q(topic__title__icontains = query) | Q(name__icontains=query) | Q(description__icontains = query))
 
-    serializer = RoomSerializer(rooms, many=True)
+    serializer = RoomSerializer(rooms, many=True, context={'request':request})
 
     return Response(serializer.data, status=status.HTTP_200_OK)
   
 
+@api_view(["GET"])
+def list_msgs(request):
+  if request.method == "GET":
+    message = Room.message_set.all()
+    serializer= MessageSerializer(message, many=True).data
+    return Response(serializer, status=status.HTTP_200_OK)
+
+  return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["POST"])
-def message_list(request):
-  pass
+@permission_classes([IsAuthenticated])
+@api_view(["DELETE", "PUT"])
+def get_msg(request, pk):
+  message = Message.objects.get(pk=pk)
+  if request.method == "DELETE":
+    message.delete()
+    return Response({"message": "succesfully deleted"}, status=status.HTTP_204_NO_CONTENT)
+
+  if request.method == "PUT":
+    serializer = CreateMessageSerializer(message, data=request.data)
+
+    if serializer.is_valid():
+      serializer.save()
+      return Response({"message": "Message Updated"}, status=status.HTTP_201_CREATED)
+
+  return Response(status=status.HTTP_400_BAD_REQUEST)
+   # data = Message.objects.fillter(room__id = instance.id)
+    # msg_serializer = MessageSerializer(data, many=True).data
