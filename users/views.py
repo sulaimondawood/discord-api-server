@@ -1,9 +1,10 @@
 from rest_framework.response import Response 
 from rest_framework import status, exceptions
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import CustomUser
-from .serializers import UserSerializer
+from .serializers import UserSerializer, UpdateUserSerializer
 
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
@@ -21,11 +22,34 @@ def users(request):
     print(query)
     if query:
       users = CustomUser.objects.filter(Q(username__icontains = query ))
-    serializer = UserSerializer(users, many=True).data
+    serializer = UpdateUserSerializer(users, many=True, context={'request':request}).data
     return  Response(status=status.HTTP_200_OK, data=serializer)
   
-  if request.method == "POST":
-    pass
+
+@permission_classes([IsAuthenticated])
+@api_view(["GET", "PUT"])
+def get_user(request, pk):
+  try:
+    user = CustomUser.objects.filter(id=pk)
+  except user.DoesNotExist:
+    return Response(status=status.HTTP_404_NOT_FOUND)
+  
+  if request.method == "GET":
+    serializer = UpdateUserSerializer(user, many=True, context={'request':request})
+    return Response(serializer.data ,status=status.HTTP_200_OK)
+
+
+  if request.method == "PUT":
+    user = CustomUser.objects.get(id=pk)
+    serializer = UpdateUserSerializer(user, data=request.data, context={'request':request})
+    if serializer.is_valid():
+      serializer.save()
+      return Response({"message":"User succesfully updated!"}, status=status.HTTP_200_OK)
+    
+    return Response(status=status.HTTP_400)
+    
+
+
 
 @api_view(["POST"])
 def register_user(request):

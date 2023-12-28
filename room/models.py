@@ -13,13 +13,15 @@ class Topic(models.Model):
 class Room(models.Model):
   host = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="rooms")
   topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name="topics")
-  name = models.CharField(max_length=200, null=True, blank=True)
-  # members = models.ManyToManyField(CustomUser, related_name="room_members", )
-  description = models.TextField(blank=True, null=True)
-
+  name = models.CharField(max_length=200, blank=True, default='')
+  members = models.ManyToManyField(CustomUser, related_name="room_members", )
+  description = models.TextField(blank=True, default='')
   avatar = models.ImageField(default="default-room-avatar.png", null=True, blank=True)
   updated= models.DateTimeField(auto_now=True)
   created = models.DateTimeField( default=timezone.now)
+
+  class Meta:
+    ordering= ("-created", '-updated')
 
   def __str__(self):
     return self.name 

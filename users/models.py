@@ -34,7 +34,7 @@ class CustomUser(AbstractUser):
   username  = models.CharField(max_length=150, unique=True)
   display_name = models.CharField(max_length=120)
   email = models.EmailField(unique=True)
-  avatar = models.ImageField(default="default-avatar.jpg", null=True, blank=True)
+  avatar = models.ImageField(default="default-avatar.png", null=True, blank=True)
   created = models.DateTimeField(default=timezone.now)
   bio = models.TextField(blank=True, null=True)
   is_active = models.BooleanField(default=True)
