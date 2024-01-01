@@ -18,12 +18,12 @@ from django.conf import settings
 
 import cloudinary
 
-# cloudinary.config(
-#   cloud_name=os.environ.get('CLOUDINARY_NAME'),
-#   api_key=os.environ.get('CLOUDINARY_KEY'),
-#   secret_key=os.environ.get('CLOUDINARY_SECRET'),
-#   secure=True
-# )
+cloudinary.config(
+  cloud_name=os.environ.get('CLOUDINARY_NAME'),
+  api_key=os.environ.get('CLOUDINARY_KEY'),
+  secret_key=os.environ.get('CLOUDINARY_SECRET'),
+  secure=True
+)
 
 
 import cloudinary.uploader
@@ -38,8 +38,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-mnbajwp*(1=ofp^s8n0s$-oevw87_fgk$t*j1i0rc+v96%!7s_'
-# SECRET_KEY = os.environ.get("SECRET_KEY", os.environ.get('DEFAULT_KEY'))
+SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG') == 'True'
 
@@ -186,7 +185,6 @@ SIMPLE_JWT = {
     "UPDATE_LAST_LOGIN": False,
 
     "ALGORITHM": "HS256",
-    "SIGNING_KEY": settings.SECRET_KEY,
     "VERIFYING_KEY": "",
     "AUDIENCE": None,
     "ISSUER": None,
