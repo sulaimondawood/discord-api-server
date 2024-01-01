@@ -73,7 +73,8 @@ def create_room(request):
 
       return Response(serializer.data, status=status.HTTP_201_CREATED)
     
-    return Response({"error": "Bad request from client"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # return Response({"error": "Bad request from client"}, status=status.HTTP_400_BAD_REQUEST)
 
 
       

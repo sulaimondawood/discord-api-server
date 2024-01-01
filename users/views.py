@@ -113,4 +113,4 @@ def login(request):
         return Response({"No active" : "This account is not active!!"},status=status.HTTP_404_NOT_FOUND)
         
     else:
-      return Response({"Invalid" : "Invalid username or password!!"},status=status.HTTP_404_NOT_FOUND)
+      return Response({"Invalid" : "Invalid email or password!!"},status=status.HTTP_404_NOT_FOUND)
