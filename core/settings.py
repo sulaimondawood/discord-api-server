@@ -16,6 +16,19 @@ import os
 from datetime import timedelta
 from django.conf import settings
 
+import cloudinary
+
+cloudinary.config(
+  cloud_name='',
+  api_key='',
+  secret_key='',
+  secure=True
+)
+
+
+import cloudinary.uploader
+import cloudinary.api
+
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,7 +42,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG') == 'True'
 
-ALLOWED_HOSTS = [os.environ.get('SECURED_SERVER_URL'),os.environ.get('UNSECURED_SERVER-URL')]
+ALLOWED_HOSTS = os.environ.get('SECURED_SERVER_URL').split(' ')
 
 
 # Application definition
@@ -48,6 +61,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     'rest_framework_simplejwt',
+    "cloudinary"
 ]
 
 MIDDLEWARE = [
