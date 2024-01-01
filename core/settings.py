@@ -19,9 +19,9 @@ from django.conf import settings
 import cloudinary
 
 cloudinary.config(
-  cloud_name='',
-  api_key='',
-  secret_key='',
+  cloud_name=os.environ.get('CLOUDINARY_NAME'),
+  api_key=os.environ.get('CLOUDINARY_KEY'),
+  secret_key=os.environ.get('CLOUDINARY_SECRET'),
   secure=True
 )
 
