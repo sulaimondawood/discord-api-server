@@ -1,6 +1,7 @@
 from django.db import models
 from users.models import CustomUser
 from django.utils import timezone
+from cloudinary.models import CloudinaryField
 
 class Topic(models.Model):
   title = models.CharField(max_length=200)
@@ -16,7 +17,8 @@ class Room(models.Model):
   name = models.CharField(max_length=200, blank=True, default='')
   members = models.ManyToManyField(CustomUser, related_name="room_members", )
   description = models.TextField(blank=True, default='')
-  avatar = models.ImageField(default="default-room-avatar.png", null=True, blank=True)
+  avatar = CloudinaryField('image',)
+  # avatar = models.ImageField(default="default-room-avatar.png", null=True, blank=True)
   updated= models.DateTimeField(auto_now=True)
   created = models.DateTimeField( default=timezone.now)
 
@@ -26,25 +28,7 @@ class Room(models.Model):
   def __str__(self):
     return self.name 
   
-  # @staticmethod
-  # def get_all_rooms(request):
-  #   records = []
-  #   for val in Room.objects.all().order_by('-created'):
-  #     data = dict(
-  #       id=val.id,
-  #       name=val.name,
-  #       # topic=val.topic,  
-  #       # host = val.host,
-  #       # members = val.members,
-  #       description = val.description,
 
-  #     )
-
-  #     image_url = request.build_absolute_uri(val.avatar.url)
-  #     data['avatar'] = image_url
-  #     records.append(data)
-
-  #     return records
 
   
 

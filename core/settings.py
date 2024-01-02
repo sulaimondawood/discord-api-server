@@ -17,15 +17,17 @@ from datetime import timedelta
 from django.conf import settings
 
 import cloudinary
+import cloudinary
 
 cloudinary.config(
   cloud_name=os.environ.get('CLOUDINARY_NAME'),
   api_key=os.environ.get('CLOUDINARY_KEY'),
-  secret_key=os.environ.get('CLOUDINARY_SECRET'),
+  api_secret=os.environ.get('CLOUDINARY_SECRET'),
   secure=True
 )
 
-
+import cloudinary.uploader
+import cloudinary.api
 import cloudinary.uploader
 import cloudinary.api
 
@@ -215,3 +217,4 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
+

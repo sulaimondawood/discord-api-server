@@ -3,19 +3,18 @@ from .models import Room, Topic, Message
 from users.serializers import UserSerializer, UpdateUserSerializer
 
 class RoomSerializer(serializers.ModelSerializer):
-  # avatar_url =serializers.SerializerMethodField()
+  avatar_url =serializers.SerializerMethodField()
   host = UserSerializer()
   members = UpdateUserSerializer(many=True)
   class Meta:
     model= Room
-    fields = ('id', "host", "topic", "name", "description", 'avatar', "updated", "members", "created")
+    fields = "__all__"
+    # fields = ('id', "host", "topic", "name", "description", 'avatar', 'avatar_url' "updated", "members", "created")
 
-  # def get_avatar_url(self, obj):
-  #   avatar = obj.avatar
-
-  #   if avatar:
-  #     request = self.context.get('request')
-  #     return request.build_absolute_uri(avatar.url)
+  def get_avatar_url(self, obj):
+    avatar = obj.avatar
+    if avatar:
+      return avatar.url
     
 
 
