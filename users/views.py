@@ -57,6 +57,12 @@ def register_user(request):
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
       user = serializer.save()
+
+      if not user.avatar or user.avatar is None:
+        default_avatar = 'https://res.cloudinary.com/dgvamsrn5/image/upload/v1704163332/default-avatar_qldtaf.png'
+        user.avatar = default_avatar
+        user.save()
+
       if user:
         return Response(status=status.HTTP_201_CREATED)
       return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
