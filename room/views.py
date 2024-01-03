@@ -11,7 +11,7 @@ from users.models import CustomUser
 from django.db.models import Q
 
 @api_view(["GET"])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def list_rooms(request):
   if request.method == "GET":
     print(request.user.id)
@@ -139,7 +139,7 @@ def list_topics(request):
     return Response(serializer_data.errors, status=status.HTTP_400_BAD_REQUEST)
 
   
-
+@permission_classes([IsAuthenticated])
 @api_view(["GET"])
 def list_msgs(request):
   if request.method == "GET":
