@@ -108,8 +108,7 @@ def login(request):
         max_age=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
         secure=True,
         httponly=True,
-        domain="https://dawood-discord.vercel.app",
-        samesite="None" )
+        )
 
         csrf.get_token(request)
         serializer = UserSerializer(instance=user).data
