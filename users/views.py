@@ -108,6 +108,7 @@ def login(request):
         max_age=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
         secure=True,
         httponly=True,
+        domain="https://dawood-discord.vercel.app",
         samesite="None" )
 
         csrf.get_token(request)
@@ -119,4 +120,4 @@ def login(request):
         return Response({"No active" : "This account is not active!!"},status=status.HTTP_404_NOT_FOUND)
         
     else:
-      return Response({"Invalid" : "Invalid email or password!!"},status=status.HTTP_404_NOT_FOUND)
+      return Response({"Invalid" : "Invalid email or password!!"},status=status.HTTP_400_BAD_REQUEST)
