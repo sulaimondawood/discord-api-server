@@ -19,7 +19,7 @@ def list_rooms(request):
     query = request.query_params.get("search")
 
     if query:
-      instance = Room.objects.filter(Q(topic__title__icontains = query) | Q(name=query))
+      instance = Room.objects.filter(Q(topic__title__icontains = query) | Q(name__icontains=query))
 
     room = RoomSerializer(instance, many=True, context={'request': request}).data
     return Response(room, status=status.HTTP_200_OK)
